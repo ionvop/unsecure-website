@@ -1,3 +1,4 @@
+const g_inputSearch = document.getElementById("g_inputSearch");
 initialize();
 
 function initialize() {
