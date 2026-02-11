@@ -88,8 +88,8 @@ php -m | grep sqlite
 ### 1. Clone the repository
 
 ```bash
-git clone <repo>
-cd <repo>
+git clone https://github.com/ionvop/unsecure-website
+cd unsecure-website
 ```
 
 ### 2. Initialize the database (required)
