@@ -206,7 +206,8 @@ function renderNavigation() {
                         background-color: #fff;
                         border-radius: 1rem;"
                         name="q"
-                        placeholder="Search...">
+                        placeholder="Search..."
+                        id="g_inputSearch">
                 </div>
                 <div style="
                     display: flex;
