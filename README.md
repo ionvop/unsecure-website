@@ -165,7 +165,7 @@ php init.php
 ├── init.sql            # Database schema
 ├── README.md           # Documentation
 ├── script.js           # Client-side scripts
-├── server.php          # Main backend logic (intentionally vulnerable)
+├── server.php          # Main backend logic
 └── style.css           # Stylesheet
 ```
 
