@@ -87,7 +87,7 @@ if ($user != false) {
         </div>
         <script src="script.js"></script>
         <script>
-
+            g_inputSearch.value = "<?= $_GET["q"] ?>";
         </script>
     </body>
 </html>
