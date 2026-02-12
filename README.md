@@ -141,6 +141,8 @@ php init.php
 
 ```
 /
+├── following/
+│   └── index.php       # Following page
 ├── login/
 │   └── index.php       # Login page
 ├── post/
