@@ -34,6 +34,12 @@ if (isset($_POST["method"])) {
         case "delete_comment":
             deleteComment();
             break;
+        case "follow":
+            follow();
+            break;
+        case "unfollow":
+            unfollow();
+            break;
         default:
             defaultMethod();
             break;
@@ -259,6 +265,31 @@ function editProfile() {
         }
     }
 
+    if ($_POST["email"] != $user["email"]) {
+        $query = <<<SQL
+            SELECT * FROM "users"
+            WHERE "email" = '{$_POST["email"]}'
+        SQL;
+
+        $user = $db->query($query)->fetchArray(SQLITE3_ASSOC);
+
+        if ($user != false) {
+            alert("Email already exists.");
+        }
+
+        $query = <<<SQL
+            UPDATE "users"
+            SET "email" = '{$_POST["email"]}'
+            WHERE "id" = '{$user["id"]}'
+        SQL;
+
+        $result = $db->exec($query);
+
+        if ($result == false) {
+            alert("Failed to change email.");
+        }
+    }
+
     $query = <<<SQL
         UPDATE "users"
         SET "description" = '{$_POST["description"]}'
@@ -305,6 +336,42 @@ function deleteComment() {
 
     if ($result == false) {
         alert("Failed to delete comment.");
+    }
+
+    header("Location: " . $_SERVER["HTTP_REFERER"]);
+}
+
+function follow() {
+    $db = new SQLite3("database.db");
+    $user = getUser();
+
+    $query = <<<SQL
+        INSERT INTO "follows" ("user_id", "target_id")
+        VALUES ('{$user["id"]}', '{$_POST["target_id"]}');
+    SQL;
+
+    $result = $db->exec($query);
+
+    if ($result == false) {
+        alert("Failed to follow.");
+    }
+
+    header("Location: " . $_SERVER["HTTP_REFERER"]);
+}
+
+function unfollow() {
+    $db = new SQLite3("database.db");
+    $user = getUser();
+
+    $query = <<<SQL
+        DELETE FROM "follows"
+        WHERE "user_id" = '{$user["id"]}' AND "target_id" = '{$_POST["target_id"]}'
+    SQL;
+
+    $result = $db->exec($query);
+
+    if ($result == false) {
+        alert("Failed to unfollow.");
     }
 
     header("Location: " . $_SERVER["HTTP_REFERER"]);
