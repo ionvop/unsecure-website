@@ -87,7 +87,18 @@ if ($user != false) {
         </div>
         <script src="script.js"></script>
         <script>
-            g_inputSearch.value = "<?= $_GET["q"] ?>";
+            const btnMore = document.getElementById("btnMore");
+            initialize();
+
+            function initialize() {
+                g_inputSearch.value = "<?= $_GET["q"] ?>";
+            }
+
+            btnMore.onclick = () => {
+                const query = new URLSearchParams(location.search);
+                query.set("max", Number(query.get("max")) + 5);
+                location.search = query.toString();
+            }
         </script>
     </body>
 </html>
