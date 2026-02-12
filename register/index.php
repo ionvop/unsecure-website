@@ -55,6 +55,14 @@ require_once "common.php";
                             Register
                         </div>
                         <div style="
+                            padding: 1rem;
+                            padding-top: 0rem;
+                            text-align: center;
+                            font-size: 0.7rem;
+                            color: #555;">
+                            WARNING: This totally secure website stores passwords in plain text. Do not use your real password.
+                        </div>
+                        <div style="
                             display: grid;
                             grid-template-columns: repeat(2, 1fr);">
                             <div>
