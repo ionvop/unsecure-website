@@ -62,6 +62,8 @@ function getUser() {
 function renderNavigation() {
     $user = getUser();
     $profileRender = "";
+    $followRender = "";
+
     $loginRender = <<<HTML
         <a style="
             display: grid;
@@ -119,6 +121,30 @@ function renderNavigation() {
                         text-overflow: ellipsis;">
                         {$user['username']}
                     </div>
+                </div>
+            </a>
+        HTML;
+
+        $followRender = <<<HTML
+            <a style="
+                display: grid;
+                grid-template-columns: max-content 1fr;
+                border-bottom: 1px solid #05a;
+                cursor: pointer;"
+                href="following/">
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    padding: 1rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M451.5-152q-14.5-5-25.5-16l-69-63q-106-97-191.5-192.5T80-634q0-94 63-157t157-63q53 0 100 22.5t80 61.5q33-39 80-61.5T660-854q94 0 157 63t63 157q0 115-85 211T602-230l-68 62q-11 11-25.5 16t-28.5 5q-14 0-28.5-5Z"/></svg>
+                </div>
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    padding: 1rem;
+                    padding-left: 0rem;
+                    color: #fff;">
+                    Following
                 </div>
             </a>
         HTML;
@@ -192,6 +218,7 @@ function renderNavigation() {
                     Home
                 </div>
             </a>
+            {$followRender}
             {$loginRender}
             <form style="
                 display: grid;
