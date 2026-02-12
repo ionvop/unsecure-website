@@ -2,3 +2,4 @@ CREATE TABLE "users" (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` TEXT UN
 CREATE TABLE `posts` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user_id` INTEGER REFERENCES `users`(`id`), `content` TEXT, `image` TEXT, `visibility` INTEGER, `time` TEXT DEFAULT (unixepoch()));
 CREATE TABLE `likes` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user_id` INTEGER REFERENCES `users`(`id`), `post_id` INTEGER REFERENCES `posts`(`id`), `time` INTEGER DEFAULT (unixepoch()));
 CREATE TABLE `comments` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user_id` INTEGER REFERENCES `users`(`id`), `post_id` INTEGER REFERENCES `posts`(`id`), `content` TEXT, `time` INTEGER DEFAULT (unixepoch()));
+CREATE TABLE `follows` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `user_id` INTEGER REFERENCES `users`(`id`), `target_id` INTEGER REFERENCES `users`(`id`), `time` INTEGER DEFAULT (unixepoch()));
