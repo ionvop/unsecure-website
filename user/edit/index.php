@@ -102,6 +102,19 @@ $user = getUser();
                                 </div>
                                 <div style="
                                     padding: 1rem;">
+                                    Email:
+                                </div>
+                                <div style="
+                                    padding: 1rem;
+                                    padding-top: 0rem;">
+                                    <input type="email"
+                                        name="email"
+                                        placeholder="Email"
+                                        value="<?= $user["email"] ?>"
+                                        required>
+                                </div>
+                                <div style="
+                                    padding: 1rem;">
                                     Description:
                                 </div>
                                 <div style="
@@ -113,6 +126,8 @@ $user = getUser();
                                 </div>
                             </div>
                             <div style="
+                                display: grid;
+                                grid-template-rows: repeat(7, max-content) 1fr max-content;
                                 padding: 1rem;">
                                 <div style="
                                     padding: 1rem;
@@ -151,15 +166,20 @@ $user = getUser();
                                     <input name="repassword"
                                         placeholder="Confirm password">
                                 </div>
+                                <div></div>
+                                <div style="
+                                    display: grid;
+                                    grid-template-columns: 1fr max-content;">
+                                    <div></div>
+                                    <div style="
+                                        padding: 1rem;">
+                                        <button name="method"
+                                            value="edit_profile">
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div style="
-                            padding: 1rem;
-                            text-align: center;">
-                            <button name="method"
-                                value="edit_profile">
-                                Save
-                            </button>
                         </div>
                     </form>
                 </div>
