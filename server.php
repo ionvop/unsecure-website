@@ -48,8 +48,6 @@ if (isset($_POST["method"])) {
     defaultMethod();
 }
 
-// Security is intentionally bad for demonstration about vulnerabilities
-
 function register() {
     $db = new SQLite3("database.db");
 
@@ -64,10 +62,12 @@ function register() {
     $query = <<<SQL
         SELECT *
         FROM "users"
-        WHERE "username" = '{$_POST["username"]}'
+        WHERE "username" = :username
     SQL;
 
-    $user = $db->query($query)->fetchArray(SQLITE3_ASSOC);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":username", $_POST["username"]);
+    $user = $stmt->execute()->fetchArray(SQLITE3_ASSOC);
 
     if ($user != false) {
         alert("Username already exists.");
@@ -76,10 +76,12 @@ function register() {
     $query = <<<SQL
         SELECT *
         FROM "users"
-        WHERE "email" = '{$_POST["email"]}'
+        WHERE "email" = :email
     SQL;
 
-    $user = $db->query($query)->fetchArray(SQLITE3_ASSOC);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":email", $_POST["email"]);
+    $user = $stmt->execute()->fetchArray(SQLITE3_ASSOC);
 
     if ($user != false) {
         alert("Email already exists.");
@@ -87,10 +89,14 @@ function register() {
 
     $query = <<<SQL
         INSERT INTO "users" ("username", "email", "password")
-        VALUES ('{$_POST["username"]}', '{$_POST["email"]}', '{$_POST["password"]}');
+        VALUES (:username, :email, :password)
     SQL;
 
-    $result = $db->exec($query);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":username", $_POST["username"]);
+    $stmt->bindValue(":email", $_POST["email"]);
+    $stmt->bindValue(":password", password_hash($_POST["password"], PASSWORD_DEFAULT));
+    $result = $stmt->execute();
 
     if ($result == false) {
         alert("Failed to register.");
@@ -107,12 +113,14 @@ function login() {
     $query = <<<SQL
         SELECT *
         FROM "users"
-        WHERE "username" = '{$_POST["username"]}' AND "password" = '{$_POST["password"]}'
+        WHERE "username" = :username
     SQL;
 
-    $user = $db->query($query)->fetchArray(SQLITE3_ASSOC);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":username", $_POST["username"]);
+    $user = $stmt->execute()->fetchArray(SQLITE3_ASSOC);
 
-    if ($user == false) {
+    if ($user == false || !password_verify($_POST["password"], $user["password"])) {
         alert("Invalid username or password.");
     }
 
@@ -136,10 +144,15 @@ function post() {
 
     $query = <<<SQL
         INSERT INTO "posts" ("user_id", "content", "image", "visibility")
-        VALUES ('{$_COOKIE["userId"]}', '{$_POST["content"]}', '{$filename}', '{$_POST["visibility"]}');
+        VALUES (:user_id, :content, :image, :visibility)
     SQL;
 
-    $result = $db->exec($query);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":user_id", $_COOKIE["userId"]);
+    $stmt->bindValue(":content", $_POST["content"]);
+    $stmt->bindValue(":image", $filename);
+    $stmt->bindValue(":visibility", $_POST["visibility"]);
+    $result = $stmt->execute();
 
     if ($result == false) {
         alert("Failed to post.");
@@ -154,10 +167,12 @@ function deletePost() {
     $query = <<<SQL
         DELETE
         FROM "posts"
-        WHERE "id" = '{$_POST["post_id"]}'
+        WHERE "id" = :post_id
     SQL;
 
-    $result = $db->exec($query);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":post_id", $_POST["post_id"]);
+    $stmt->execute();
     header("Location: ./");
 }
 
@@ -165,12 +180,22 @@ function like() {
     $db = new SQLite3("database.db");
     $user = getUser();
 
+    // $query = <<<SQL
+    //     INSERT INTO "likes" ("user_id", "post_id")
+    //     VALUES ('{$user["id"]}', '{$_POST["post_id"]}');
+    // SQL;
+
+    // $result = $db->exec($query);
+
     $query = <<<SQL
         INSERT INTO "likes" ("user_id", "post_id")
-        VALUES ('{$user["id"]}', '{$_POST["post_id"]}');
+        VALUES (:user_id, :post_id)
     SQL;
 
-    $result = $db->exec($query);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":user_id", $user["id"]);
+    $stmt->bindValue(":post_id", $_POST["post_id"]);
+    $result = $stmt->execute();
 
     if ($result == false) {
         alert("Failed to like.");
@@ -185,10 +210,13 @@ function unlike() {
 
     $query = <<<SQL
         DELETE FROM "likes"
-        WHERE "user_id" = '{$user["id"]}' AND "post_id" = '{$_POST["post_id"]}'
+        WHERE "user_id" = :user_id AND "post_id" = :post_id
     SQL;
 
-    $result = $db->exec($query);
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(":user_id", $user["id"]);
+    $stmt->bindValue(":post_id", $_POST["post_id"]);
+    $result = $stmt->execute();
 
     if ($result == false) {
         alert("Failed to unlike.");
@@ -212,11 +240,14 @@ function editProfile() {
 
         $query = <<<SQL
             UPDATE "users"
-            SET "password" = '{$_POST["newpassword"]}'
-            WHERE "id" = '{$user["id"]}'
+            SET "password" = :password
+            WHERE "id" = :user_id
         SQL;
 
-        $result = $db->exec($query);
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(":password", password_hash($_POST["newpassword"], PASSWORD_DEFAULT));
+        $stmt->bindValue(":user_id", $user["id"]);
+        $result = $stmt->execute();
 
         if ($result == false) {
             alert("Failed to change password.");
@@ -229,11 +260,14 @@ function editProfile() {
 
         $query = <<<SQL
             UPDATE "users"
-            SET "avatar" = '{$filename}'
-            WHERE "id" = '{$user["id"]}'
+            SET "avatar" = :avatar
+            WHERE "id" = :user_id
         SQL;
 
-        $result = $db->exec($query);
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(":avatar", $filename);
+        $stmt->bindValue(":user_id", $user["id"]);
+        $result = $stmt->execute();
 
         if ($result == false) {
             alert("Failed to change avatar.");
@@ -243,10 +277,12 @@ function editProfile() {
     if ($_POST["username"] != $user["username"]) {
         $query = <<<SQL
             SELECT * FROM "users"
-            WHERE "username" = '{$_POST["username"]}'
+            WHERE "username" = :username
         SQL;
 
-        $user = $db->query($query)->fetchArray(SQLITE3_ASSOC);
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(":username", $_POST["username"]);
+        $user = $stmt->execute()->fetchArray(SQLITE3_ASSOC);
 
         if ($user != false) {
             alert("Username already exists.");
@@ -254,11 +290,14 @@ function editProfile() {
 
         $query = <<<SQL
             UPDATE "users"
-            SET "username" = '{$_POST["username"]}'
-            WHERE "id" = '{$user["id"]}'
+            SET "username" = :username
+            WHERE "id" = :user_id
         SQL;
 
-        $result = $db->exec($query);
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(":username", $_POST["username"]);
+        $stmt->bindValue(":user_id", $user["id"]);
+        $result = $stmt->execute();
 
         if ($result == false) {
             alert("Failed to change username.");
